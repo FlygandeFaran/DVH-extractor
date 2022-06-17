@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Has a list of">
+    <Position X="6.073" Y="2.75" Height="0.312" Width="0.908" />
+  </Comment>
+  <Comment CommentText="Has">
+    <Position X="3.521" Y="2.229" Height="0.323" Width="0.7" />
+  </Comment>
+  <Comment CommentText="Has">
+    <Position X="8.531" Y="2.719" Height="0.323" Width="0.7" />
+  </Comment>
+  <Class Name="DVHextractor.MainForm">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>BSCAEAAAgLgAEBAAEACAABBDEQAAACAAICAAAAAAEAg=</HashCode>
+      <FileName>MainForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DVHextractor.IonDVH">
+    <Position X="9.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAABgAIAAAEAAAABAAEAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>IonDVH.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DVHextractor.Contour">
+    <Position X="7" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAEAAAAAAYAAAAAAAAA=</HashCode>
+      <FileName>Contour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DVHextractor.ContourManager">
+    <Position X="4.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAACAAQAAAAAAAAQAAABQAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ContourManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

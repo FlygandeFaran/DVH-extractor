@@ -1,0 +1,10 @@
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\bin\Debug\Assignment7.exe.config
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\bin\Debug\Assignment7.exe
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\bin\Debug\Assignment7.pdb
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.csprojAssemblyReference.cache
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.MainForm.resources
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.Properties.Resources.resources
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.csproj.GenerateResource.cache
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.csproj.CoreCompileInputs.cache
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.exe
+C:\Users\efura\Documents\C#\Assignment7\Assignment7\obj\Debug\Assignment7.pdb
