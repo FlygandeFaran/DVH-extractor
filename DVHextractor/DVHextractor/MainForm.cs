@@ -77,11 +77,9 @@ namespace DVHextractor
         {
             dgvDVHtable.DataSource = null;
             if (lsbAbsOrRelTable.SelectedIndex == (int)UnitType.Absolute && absDT != null)
-                MessageBox.Show(absDT.ToString());
-            //dgvDVHtable.DataSource = absDT;
+                dgvDVHtable.DataSource = absDT;
             else if (lsbAbsOrRelTable.SelectedIndex == (int)UnitType.Relative && relDT != null)
-                MessageBox.Show(relDT.ToString());
-            //dgvDVHtable.DataSource = relDT;
+                dgvDVHtable.DataSource = relDT;
         }
         private void UpdateListOfStructures()
         {
@@ -185,26 +183,36 @@ namespace DVHextractor
             dt.Columns.Add("Max", typeof(string));
             dt.Columns.Add("Mean", typeof(string));
 
+            bool isUplan = false;
+
             if (cmSelectedContours.InputValues.Count > 0)
                 foreach (string column in cmSelectedContours.InputValues) // lägger till inputsen som rubriker
                     dt.Columns.Add(column.ToString(), typeof(string));
-            IonPlanSetup temp_plan = m_ionPlan;
-            //foreach (IonPlanSetup temp_plan in lsListOfPlans.SelectedItems) // går igenom alla valda planer
-            //{
+            
+            foreach (IonPlanSetup temp_plan in lsListOfPlans.SelectedItems) // går igenom alla valda planer
+            {
                 if (temp_plan.IsDoseValid)
                 {
                     foreach (string contourName in cmSelectedContours.UniqueContourList) //varje unik kontur
                     {
                         Contour uniqContour = cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName));
-                        if (temp_plan.PlanUncertainties.Count() > 0) // Behövs för att lura Eclipse, måste räkna uPlan först!
-                            temp_plan.PlanUncertainties.First().GetDVHCumulativeData(uniqContour.Structure, VMS.TPS.Common.Model.Types.DoseValuePresentation.Relative, VMS.TPS.Common.Model.Types.VolumePresentation.Relative, 0.001);
-
+                        PlanUncertainty temp_uPlan = temp_plan.PlanUncertainties.FirstOrDefault(plan => !plan.Id.Contains(" "));
+                        if (temp_plan.PlanUncertainties.Count() > 0 && temp_uPlan != null && (rbAllUnCalc.Checked || rbExtremeUnCalc.Checked)) // Behövs för att lura Eclipse, måste räkna uPlan först! OBS UPLANS ÄR FAN LÖMSKA
+                        {
+                            if (temp_uPlan.Dose != null)
+                            {
+                                uniqContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
+                                temp_uPlan.GetDVHCumulativeData(uniqContour.Structure, VMS.TPS.Common.Model.Types.DoseValuePresentation.Relative, VMS.TPS.Common.Model.Types.VolumePresentation.Relative, 0.001);
+                                isUplan = true;
+                            }
+                        }
+                        
                         if (temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName)) != null)
                         {
                             object[] ContourInputs = GenerateData(temp_plan, contourName);
 
                             dt.Rows.Add(ContourInputs);
-                            if (rbAllUnCalc.Checked && temp_plan.PlanUncertainties.Count() > 0)
+                            if (rbAllUnCalc.Checked && isUplan)
                             {
                                 foreach (PlanUncertainty uPlan in temp_plan.PlanUncertainties)
                                 {
@@ -215,7 +223,7 @@ namespace DVHextractor
                                     }
                                 }
                             }
-                            else if (rbExtremeUnCalc.Checked && temp_plan.PlanUncertainties.Count() > 0)
+                            else if (rbExtremeUnCalc.Checked && isUplan)
                             {
                                 object[] maxUContourInputs = GenerateMaxOutliers(temp_plan, contourName);
                                 object[] minUContourInputs = GenerateMinOutliers(temp_plan, contourName);
@@ -228,7 +236,7 @@ namespace DVHextractor
                 }
                 else
                     MessageBox.Show("No calculated dose in " + temp_plan.Id);
-            //}
+            }
             return dt;
         }
 
@@ -253,6 +261,7 @@ namespace DVHextractor
             {
                 if (!uPlan.Id.Contains(" ")) // behövs för att eclipse skapar konstiga "extra" uPlaner med " "
                 {
+                    uniqContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                     DVH = new IonDVH(uniqContour, temp_plan, uPlan);
 
                     if (m_IsAbsTable)
@@ -286,6 +295,7 @@ namespace DVHextractor
                                 {
                                     if (tempContour.InputName == cmSelectedContours.InputValues.ElementAt(i - 5)) // om input för den här konturen hittas ansätts det, annars blir det null
                                     {
+                                        tempContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                                         DVH = new IonDVH(tempContour, temp_plan, uPlan);
                                         if (DVH.OutputValue > outputValue[i])
                                         {
@@ -321,6 +331,7 @@ namespace DVHextractor
             {
                 if (!uPlan.Id.Contains(" ")) // behövs för att eclipse skapar konstiga "extra" uPlaner med " "
                 {
+                    uniqContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                     DVH = new IonDVH(uniqContour, temp_plan, uPlan);
 
                     if (m_IsAbsTable)
@@ -355,6 +366,7 @@ namespace DVHextractor
                                 {
                                     if (tempContour.InputName == cmSelectedContours.InputValues.ElementAt(i - 5)) // om input för den här konturen hittas ansätts det, annars blir det null
                                     {
+                                        tempContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                                         DVH = new IonDVH(tempContour, temp_plan, uPlan);
                                         if (DVH.OutputValue < outputValue[i])
                                         {
@@ -373,7 +385,8 @@ namespace DVHextractor
 
         private object[] GenerateData(IonPlanSetup plan, string contourName) // tar fram alla data från DVH
         {
-            Contour uniqContour = new Contour(cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName)));
+            Contour uniqContour = cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName));
+            uniqContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
             DVH = new IonDVH(uniqContour, plan);
             object[] ContourInputs = GenerateMaxMinValues(plan.Id, uniqContour, false); // skapar object för tabell med plats för alla inputs + planID, konturnamn, min, max, medel
 
@@ -381,12 +394,14 @@ namespace DVHextractor
             {
                 if (tempContour.Name == contourName) // tar fram varje input från konturer med det här unika namnet
                 {
+                    tempContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                     for (int i = 5; i < ContourInputs.Length; ++i)
                     {
                         if (!string.IsNullOrEmpty(tempContour.Input))
                         {
                             if (tempContour.InputName == cmSelectedContours.InputValues.ElementAt(i - 5)) // om input för den här konturen hittas ansätts det, annars blir det null
                             {
+                                tempContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                                 DVH = new IonDVH(tempContour, plan);
                                 ContourInputs[i] = DVH.OutputValue.ToString("0.00");
                             }
@@ -399,6 +414,7 @@ namespace DVHextractor
         private object[] GenerateUdata(IonPlanSetup plan, PlanUncertainty uPlan, string contourName) // tar fram alla data från DVH
         {
             Contour uniqContour = cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName));
+            uniqContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
             DVH = new IonDVH(uniqContour, plan, uPlan);
             object[] ContourInputs = GenerateMaxMinValues(uPlan.Id, uniqContour, false); // skapar object för tabell med plats för alla inputs + planID, konturnamn, min, max, medel
 
@@ -412,6 +428,7 @@ namespace DVHextractor
                         {
                             if (tempContour.InputName == cmSelectedContours.InputValues.ElementAt(i - 5)) // om input för den här konturen hittas ansätts det, annars blir det null
                             {
+                                tempContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                                 DVH = new IonDVH(tempContour, plan, uPlan);
                                 ContourInputs[i] = DVH.OutputValue.ToString("0.00");
                             }
@@ -424,6 +441,7 @@ namespace DVHextractor
         private object[] GenerateOutlyingUdata(IonPlanSetup plan, PlanUncertainty uPlan, string contourName) // tar fram alla data från DVH
         {
             Contour uniqContour = cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName));
+            uniqContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
             DVH = new IonDVH(uniqContour, plan, uPlan);
             object[] ContourInputs = GenerateMaxMinValues(uPlan.Id, uniqContour, false); // skapar object för tabell med plats för alla inputs + planID, konturnamn, min, max, medel
 
@@ -437,6 +455,7 @@ namespace DVHextractor
                         {
                             if (tempContour.InputName == cmSelectedContours.InputValues.ElementAt(i - 5)) // om input för den här konturen hittas ansätts det, annars blir det null
                             {
+                                tempContour.Structure = plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
                                 DVH = new IonDVH(tempContour, plan, uPlan);
                                 ContourInputs[i] = DVH.OutputValue.ToString("0.00");
                             }
@@ -475,6 +494,11 @@ namespace DVHextractor
         }
         private void btnAddContour_Click(object sender, EventArgs e)
         {
+            UpdateSelectedContour();
+        }
+
+        private void UpdateSelectedContour()
+        {
             if (lbListOfCourses.SelectedIndex != -1)
             {
                 if (lsListOfPlans.SelectedIndex != -1)
@@ -501,6 +525,7 @@ namespace DVHextractor
             else
                 MessageBox.Show("No course seleceted");
         }
+
         private void btnRemoveContour_Click(object sender, EventArgs e)
         {
             int index = lsbSelectedContours.SelectedIndex;
@@ -648,8 +673,24 @@ namespace DVHextractor
 
         private void lsListOfPlans_SelectedIndexChanged(object sender, EventArgs e)
         {
+            UpdateRadioButtons();
             if (lsListOfPlans.SelectedIndex != -1)
                 UpdateListOfStructures();
+        }
+
+        private void UpdateRadioButtons()
+        {
+            if (lsListOfPlans.SelectedItems.Count == 1 && (IonPlanSetup)lsListOfPlans.SelectedItem == m_ionPlan)
+            {
+                rbAllUnCalc.Enabled = true;
+                rbExtremeUnCalc.Enabled = true;
+            }
+            else
+            {
+                rbNone.Checked = true;
+                rbAllUnCalc.Enabled = false;
+                rbExtremeUnCalc.Enabled = false;
+            }
         }
 
         private void lsbAbsOrRelTable_SelectedIndexChanged(object sender, EventArgs e)
@@ -663,5 +704,14 @@ namespace DVHextractor
             dgvDVHtable.DataSource = null;
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //MessageBox.Show("OBS! Ladda om patient om du vill räkna robustdoser på annan plan.");
+        }
+
+        private void lsbAvailableContours_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            UpdateSelectedContour();
+        }
     }
 }

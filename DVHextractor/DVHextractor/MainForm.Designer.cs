@@ -54,6 +54,7 @@
             this.saveTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToCsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addToExistingTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCalculate = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.lsListOfPlans = new System.Windows.Forms.ListBox();
@@ -67,7 +68,6 @@
             this.rbNone = new System.Windows.Forms.RadioButton();
             this.lsbAbsOrRelTable = new System.Windows.Forms.ListBox();
             this.sfdlgSaveToExcel = new System.Windows.Forms.SaveFileDialog();
-            this.addToExistingTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -86,6 +86,7 @@
             this.lsbAvailableContours.Name = "lsbAvailableContours";
             this.lsbAvailableContours.Size = new System.Drawing.Size(142, 277);
             this.lsbAvailableContours.TabIndex = 0;
+            this.lsbAvailableContours.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lsbAvailableContours_MouseDoubleClick);
             // 
             // lsbSelectedContours
             // 
@@ -321,7 +322,7 @@
             // 
             this.saveTemplateToolStripMenuItem.Name = "saveTemplateToolStripMenuItem";
             this.saveTemplateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveTemplateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.saveTemplateToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
             this.saveTemplateToolStripMenuItem.Text = "Save Template";
             this.saveTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveTemplateToolStripMenuItem_Click);
             // 
@@ -329,7 +330,7 @@
             // 
             this.loadTemplateToolStripMenuItem.Name = "loadTemplateToolStripMenuItem";
             this.loadTemplateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.loadTemplateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.loadTemplateToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
             this.loadTemplateToolStripMenuItem.Text = "Load Template";
             this.loadTemplateToolStripMenuItem.Click += new System.EventHandler(this.loadTemplateToolStripMenuItem_Click);
             // 
@@ -337,9 +338,16 @@
             // 
             this.exportToCsvToolStripMenuItem.Name = "exportToCsvToolStripMenuItem";
             this.exportToCsvToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.exportToCsvToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.exportToCsvToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
             this.exportToCsvToolStripMenuItem.Text = "Export to csv";
             this.exportToCsvToolStripMenuItem.Click += new System.EventHandler(this.exportToCsvToolStripMenuItem_Click);
+            // 
+            // addToExistingTemplateToolStripMenuItem
+            // 
+            this.addToExistingTemplateToolStripMenuItem.Name = "addToExistingTemplateToolStripMenuItem";
+            this.addToExistingTemplateToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.addToExistingTemplateToolStripMenuItem.Text = "Add to existing Template";
+            this.addToExistingTemplateToolStripMenuItem.Click += new System.EventHandler(this.addToExistingTemplateToolStripMenuItem_Click);
             // 
             // btnCalculate
             // 
@@ -443,13 +451,6 @@
             this.lsbAbsOrRelTable.TabIndex = 16;
             this.lsbAbsOrRelTable.SelectedIndexChanged += new System.EventHandler(this.lsbAbsOrRelTable_SelectedIndexChanged);
             // 
-            // addToExistingTemplateToolStripMenuItem
-            // 
-            this.addToExistingTemplateToolStripMenuItem.Name = "addToExistingTemplateToolStripMenuItem";
-            this.addToExistingTemplateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.addToExistingTemplateToolStripMenuItem.Text = "Add to existing Template";
-            this.addToExistingTemplateToolStripMenuItem.Click += new System.EventHandler(this.addToExistingTemplateToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -468,7 +469,8 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "DVH Calculator";
+            this.Text = "DVH Calculator v1.0 (Developed by Erik Fura)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox3.ResumeLayout(false);

@@ -55,12 +55,11 @@ namespace DVHextractor
             {
                 object[] array = row.ItemArray;
                 string output = "";
-                for (i = 0; i < array.Length - 1; i++)
+                for (i = 0; i < array.Length; i++)
                 {
                     output = removeUplanFromNumber(array[i].ToString());
                     sw.Write(output + ";");
                 }
-                sw.Write(output);
                 sw.WriteLine();
 
             }
