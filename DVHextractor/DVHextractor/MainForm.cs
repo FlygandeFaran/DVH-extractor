@@ -196,42 +196,45 @@ namespace DVHextractor
                     foreach (string contourName in cmSelectedContours.UniqueContourList) //varje unik kontur
                     {
                         Contour uniqContour = cmSelectedContours.ContourList.FirstOrDefault(s => s.Name.Equals(contourName));
-                        PlanUncertainty temp_uPlan = temp_plan.PlanUncertainties.FirstOrDefault(plan => !plan.Id.Contains(" "));
-                        if (temp_plan.PlanUncertainties.Count() > 0 && temp_uPlan != null && (rbAllUnCalc.Checked || rbExtremeUnCalc.Checked)) // Behövs för att lura Eclipse, måste räkna uPlan först! OBS UPLANS ÄR FAN LÖMSKA
-                        {
-                            if (temp_uPlan.Dose != null)
-                            {
-                                uniqContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
-                                temp_uPlan.GetDVHCumulativeData(uniqContour.Structure, VMS.TPS.Common.Model.Types.DoseValuePresentation.Relative, VMS.TPS.Common.Model.Types.VolumePresentation.Relative, 0.001);
-                                isUplan = true;
-                            }
-                        }
-                        
-                        if (temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName)) != null)
-                        {
-                            object[] ContourInputs = GenerateData(temp_plan, contourName);
 
-                            dt.Rows.Add(ContourInputs);
-                            if (rbAllUnCalc.Checked && isUplan)
+                        if (!uniqContour.Structure.IsEmpty)
+                        {
+                            PlanUncertainty temp_uPlan = temp_plan.PlanUncertainties.FirstOrDefault(plan => !plan.Id.Contains(" "));
+                            if (temp_plan.PlanUncertainties.Count() > 0 && temp_uPlan != null && (rbAllUnCalc.Checked || rbExtremeUnCalc.Checked)) // Behövs för att lura Eclipse, måste räkna uPlan först! OBS UPLANS ÄR FAN LÖMSKA
                             {
-                                foreach (PlanUncertainty uPlan in temp_plan.PlanUncertainties)
+                                if (temp_uPlan.Dose != null)
                                 {
-                                    if (!uPlan.Id.Contains(" ")) // behövs för att eclipse skapar konstiga "extra" uPlaner med " "
-                                    {
-                                        object[] uContourInputs = GenerateUdata(temp_plan, uPlan, contourName);
-                                        dt.Rows.Add(uContourInputs);
-                                    }
+                                    uniqContour.Structure = temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName));
+                                    temp_uPlan.GetDVHCumulativeData(uniqContour.Structure, VMS.TPS.Common.Model.Types.DoseValuePresentation.Relative, VMS.TPS.Common.Model.Types.VolumePresentation.Relative, 0.001);
+                                    isUplan = true;
                                 }
                             }
-                            else if (rbExtremeUnCalc.Checked && isUplan)
+
+                            if (temp_plan.StructureSet.Structures.FirstOrDefault(cont => cont.Id.Equals(contourName)) != null)
                             {
-                                object[] maxUContourInputs = GenerateMaxOutliers(temp_plan, contourName);
-                                object[] minUContourInputs = GenerateMinOutliers(temp_plan, contourName);
-                                dt.Rows.Add(maxUContourInputs);
-                                dt.Rows.Add(minUContourInputs);
+                                object[] ContourInputs = GenerateData(temp_plan, contourName);
+
+                                dt.Rows.Add(ContourInputs);
+                                if (rbAllUnCalc.Checked && isUplan)
+                                {
+                                    foreach (PlanUncertainty uPlan in temp_plan.PlanUncertainties)
+                                    {
+                                        if (!uPlan.Id.Contains(" ")) // behövs för att eclipse skapar konstiga "extra" uPlaner med " "
+                                        {
+                                            object[] uContourInputs = GenerateUdata(temp_plan, uPlan, contourName);
+                                            dt.Rows.Add(uContourInputs);
+                                        }
+                                    }
+                                }
+                                else if (rbExtremeUnCalc.Checked && isUplan)
+                                {
+                                    object[] maxUContourInputs = GenerateMaxOutliers(temp_plan, contourName);
+                                    object[] minUContourInputs = GenerateMinOutliers(temp_plan, contourName);
+                                    dt.Rows.Add(maxUContourInputs);
+                                    dt.Rows.Add(minUContourInputs);
+                                }
                             }
                         }
-
                     }
                 }
                 else
